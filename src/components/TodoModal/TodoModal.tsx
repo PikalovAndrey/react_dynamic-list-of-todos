@@ -3,17 +3,18 @@ import { Loader } from '../Loader';
 import { getUser } from '../../api';
 import { User } from '../../types/User';
 import { Todo } from '../../types/Todo';
+import classNames from 'classnames';
 
 interface TodoModalProps {
   todo: Todo;
-  handleSetSelectedTodoId: React.Dispatch<React.SetStateAction<number>>;
+  onSetSelectedTodoId: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const TodoModal: React.FC<TodoModalProps> = ({
-  handleSetSelectedTodoId,
+  onSetSelectedTodoId,
   todo,
 }) => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export const TodoModal: React.FC<TodoModalProps> = ({
       <div className="modal-background" />
 
       {isLoading ? (
-        <Loader />
+        <Loader key="loader" />
       ) : (
         <div className="modal-card">
           <header className="modal-card-head">
@@ -47,7 +48,7 @@ export const TodoModal: React.FC<TodoModalProps> = ({
               type="button"
               className="delete"
               data-cy="modal-close"
-              onClick={() => handleSetSelectedTodoId(0)}
+              onClick={() => onSetSelectedTodoId(0)}
             />
           </header>
 
@@ -57,11 +58,14 @@ export const TodoModal: React.FC<TodoModalProps> = ({
             </p>
 
             <p className="block" data-cy="modal-user">
-              {todo.completed ? (
-                <strong className="has-text-success">Done</strong>
-              ) : (
-                <strong className="has-text-danger">Planned</strong>
-              )}
+              <strong
+                className={classNames({
+                  'has-text-success': todo.completed,
+                  'has-text-danger': !todo.completed,
+                })}
+              >
+                {todo.completed ? 'Done' : 'Planned'}
+              </strong>
 
               {' by '}
 
