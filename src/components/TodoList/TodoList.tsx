@@ -5,12 +5,12 @@ import { Todo } from '../../types/Todo';
 interface TodoListProps {
   todos: Todo[];
   selectedTodoId: number;
-  setSelectedTodoId: React.Dispatch<React.SetStateAction<number>>;
+  handleSelectTodoId: React.Dispatch<React.SetStateAction<number>>;
 }
 export const TodoList: React.FC<TodoListProps> = ({
   todos,
   selectedTodoId,
-  setSelectedTodoId,
+  handleSelectTodoId: setSelectedTodoId,
 }) => {
   return (
     <>

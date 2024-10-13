@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import 'bulma/css/bulma.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 
@@ -12,17 +12,22 @@ import { Todo } from './types/Todo';
 export const App: React.FC = () => {
   const [todosFromServer, setTodosFromServer] = useState<Todo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filteredTodos, setFilteredTodos] = useState<Todo[]>(todosFromServer);
+  const [filteredTodos, setFilteredTodos] = useState<Todo[]>([]);
   const [selectedTodoId, setSelectedTodoId] = useState(0);
 
   useEffect(() => {
     setIsLoading(true);
     getTodos()
-      .then(setTodosFromServer)
+      .then(todos => {
+        setTodosFromServer(todos);
+        setFilteredTodos(todos);
+      })
       .finally(() => setIsLoading(false));
   }, []);
 
-  const selectedTodo = filteredTodos.find(todo => todo.id === selectedTodoId);
+  const selectedTodo = useMemo(() => {
+    return filteredTodos.find(todo => todo.id === selectedTodoId);
+  }, [filteredTodos, selectedTodoId]);
 
   return (
     <>
@@ -34,7 +39,7 @@ export const App: React.FC = () => {
             <div className="block">
               <TodoFilter
                 todos={todosFromServer}
-                onFilterChange={setFilteredTodos}
+                handleFilterChange={setFilteredTodos}
               />
             </div>
 
@@ -44,7 +49,7 @@ export const App: React.FC = () => {
                 <TodoList
                   todos={filteredTodos}
                   selectedTodoId={selectedTodoId}
-                  setSelectedTodoId={setSelectedTodoId}
+                  handleSelectTodoId={setSelectedTodoId}
                 />
               )}
             </div>
@@ -53,7 +58,10 @@ export const App: React.FC = () => {
       </div>
 
       {selectedTodo && (
-        <TodoModal todo={selectedTodo} setSelectedTodoId={setSelectedTodoId} />
+        <TodoModal
+          todo={selectedTodo}
+          handleSetSelectedTodoId={setSelectedTodoId}
+        />
       )}
     </>
   );

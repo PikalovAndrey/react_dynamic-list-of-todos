@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Todo } from '../../types/Todo';
 
 interface TodoFilterProps {
   todos: Todo[];
-  onFilterChange: (filteredTodos: Todo[]) => void;
+  handleFilterChange: (filteredTodos: Todo[]) => void;
 }
 
 export enum FilterOptions {
@@ -14,12 +14,12 @@ export enum FilterOptions {
 
 export const TodoFilter: React.FC<TodoFilterProps> = ({
   todos,
-  onFilterChange,
+  handleFilterChange,
 }) => {
   const [filter, setFilter] = useState<FilterOptions>(FilterOptions.ALL);
   const [query, setQuery] = useState('');
 
-  const filterTodos = () => {
+  const handleFilterTodos = () => {
     let filteredTodos = todos.filter(todo => {
       switch (filter) {
         case FilterOptions.ACTIVE:
@@ -37,12 +37,30 @@ export const TodoFilter: React.FC<TodoFilterProps> = ({
       );
     }
 
-    onFilterChange(filteredTodos);
+    handleFilterChange(filteredTodos);
   };
 
   useEffect(() => {
-    filterTodos();
+    handleFilterTodos();
   }, [filter, query, todos]);
+
+  const handleChangeFilter = useCallback(
+    (event: React.ChangeEvent<HTMLSelectElement>) => {
+      setFilter(event.target.value as FilterOptions);
+    },
+    [],
+  );
+
+  const handleChangeQuery = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setQuery(event.target.value);
+    },
+    [],
+  );
+
+  const handleClearQuery = useCallback(() => {
+    setQuery('');
+  }, []);
 
   return (
     <form className="field has-addons">
@@ -51,7 +69,7 @@ export const TodoFilter: React.FC<TodoFilterProps> = ({
           <select
             data-cy="statusSelect"
             value={filter}
-            onChange={event => setFilter(event.target.value as FilterOptions)}
+            onChange={handleChangeFilter}
           >
             <option value="all">All</option>
             <option value="active">Active</option>
@@ -67,7 +85,7 @@ export const TodoFilter: React.FC<TodoFilterProps> = ({
           className="input"
           placeholder="Search..."
           value={query}
-          onChange={event => setQuery(event.target.value)}
+          onChange={handleChangeQuery}
         />
         <span className="icon is-left">
           <i className="fas fa-magnifying-glass" />
@@ -79,7 +97,7 @@ export const TodoFilter: React.FC<TodoFilterProps> = ({
               data-cy="clearSearchButton"
               type="button"
               className="delete"
-              onClick={() => setQuery('')}
+              onClick={handleClearQuery}
             />
           </span>
         )}

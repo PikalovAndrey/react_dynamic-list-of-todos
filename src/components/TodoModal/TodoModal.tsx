@@ -6,17 +6,18 @@ import { Todo } from '../../types/Todo';
 
 interface TodoModalProps {
   todo: Todo;
-  setSelectedTodoId: React.Dispatch<React.SetStateAction<number>>;
+  handleSetSelectedTodoId: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const TodoModal: React.FC<TodoModalProps> = ({
-  setSelectedTodoId,
+  handleSetSelectedTodoId,
   todo,
 }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
+    setIsLoading(true);
     getUser(todo.userId)
       .then(userData => {
         setUser(userData);
@@ -46,7 +47,7 @@ export const TodoModal: React.FC<TodoModalProps> = ({
               type="button"
               className="delete"
               data-cy="modal-close"
-              onClick={() => setSelectedTodoId(0)}
+              onClick={() => handleSetSelectedTodoId(0)}
             />
           </header>
 
